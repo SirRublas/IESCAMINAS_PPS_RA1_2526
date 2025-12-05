@@ -8,7 +8,15 @@ Para este apartado he creado una pequeña aplicación en Python que simula un ci
 - Preservación de mayúsculas/minúsculas y caracteres no alfabéticos.
 - Validación de entradas de usuario para evitar errores de ejecución.
 
-## Instrucciones:
+## Ejecucion:
+Ejecucion en Windows:
+- Abrir PowerShell o CMD.
+- Navegar al directorio donde se encuentra cripto.py:
+- Ejecución de la aplicación: "python3 cripto_manager.py"
+- Ejecución de la batería de tests: "python3 -m unittest test_cripto_manager.py"
 
-- Ejecución de la aplicación: "python cripto_manager.py"
-- Ejecución de la batería de tests: "python -m unittest test_cripto_manager.py"
+Ejecucion en Linux:
+- Abrir un terminal.
+- Navegar al directorio donde se encuentra cripto.py:
+- Ejecución de la aplicación: "python3 cripto_manager.py"
+- Ejecución de la batería de tests: "python3 -m unittest test_cripto_manager.py"
