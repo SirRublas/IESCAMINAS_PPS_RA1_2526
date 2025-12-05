@@ -1,35 +1,42 @@
 #!/bin/bash
 
-# Función para obtener la MAC (intenta usar ip link, compatible con la mayoría de Linux modernos)
-obtener_mac() {
-    # Busca líneas que contengan 'ether' (Ethernet/WiFi) y saca la segunda columna
-    ip link show | awk '/ether/ {print $2}' | head -n 1
-}
+# Detectar sistema operativo
+SO=$(uname -s)
 
-# Obtener Usuario
-USUARIO=$(whoami)
+# Obtener usuario
+if [[ "$SO" == "Linux" || "$SO" == "Darwin" ]]; then
+    USUARIO=$(whoami)
+    EQUIPO=$(hostname)
 
-# Obtener Nombre del Equipo (Hostname)
-EQUIPO=$(hostname)
+    # Obtener sistema operativo
+    if [ -f /etc/os-release ]; then
+        . /etc/os-release
+        SISTEMA=$PRETTY_NAME
+    else
+        SISTEMA=$(uname -sr)
+    fi
 
-# Obtener Sistema Operativo
-# Intentamos leer el archivo os-release para obtener el nombre completo
-if [ -f /etc/os-release ]; then
-    # Importamos las variables del archivo
-    . /etc/os-release
-    SISTEMA=$PRETTY_NAME
+    # Obtener MAC
+    MAC=$(ip link show 2>/dev/null | awk '/ether/ {print $2}' | head -n 1)
+    if [ -z "$MAC" ]; then
+        MAC="No detectada (verifique permisos o interfaz)"
+    fi
+
+elif [[ "$SO" == *"MINGW"* || "$SO" == *"CYGWIN"* || "$SO" == *"MSYS"* ]]; then
+    # Windows (Git Bash / Cygwin / MSYS)
+    USUARIO=$(whoami)
+    EQUIPO=$(hostname)
+    SISTEMA=$(cmd.exe /c ver | tr -d '\r')
+    
+    # Obtener MAC desde Windows
+    MAC=$(ipconfig /all | awk '/Dirección física/ {print $NF}' | head -n 1)
+    if [ -z "$MAC" ]; then
+        MAC="No detectada (verifique permisos o interfaz)"
+    fi
 else
-    # Fallback genérico si no existe el archivo
-    SISTEMA=$(uname -sr)
+    echo "Sistema operativo no soportado: $SO"
+    exit 1
 fi
 
-# Obtener MAC
-MAC=$(obtener_mac)
-
-# Si no se encuentra MAC
-if [ -z "$MAC" ]; then
-    MAC="No detectada (Verifique permisos o interfaz)"
-fi
-
-# Salida con toda la informacion
+# Mostrar resultado
 echo "El usuario '$USUARIO' está conectado en el equipo '$EQUIPO', ejecutando el sistema '$SISTEMA' con dirección MAC: $MAC"
